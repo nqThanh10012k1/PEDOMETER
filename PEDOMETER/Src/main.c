@@ -16,40 +16,40 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define USART1_GPIO_PORT					GPIOA
-#define USART1_TX_GPIO_PIN					GPIO_Pin_9
-#define USART1_RX_GPIO_PIN					GPIO_Pin_10
+#define USART1_GPIO_PORT						GPIOA
+#define USART1_TX_GPIO_PIN						GPIO_Pin_9
+#define USART1_RX_GPIO_PIN						GPIO_Pin_10
 
-#define USART_BAUDRATE						9600
+#define USART_BAUDRATE							9600
 
-#define SPI2_GPIO_PORT						GPIOB
-#define SPI2_SCK_PIN						GPIO_Pin_13
-#define SPI2_MOSI_PIN						GPIO_Pin_15
-#define SPI2_NSS_PIN						GPIO_Pin_12
+#define SPI2_GPIO_PORT							GPIOB
+#define SPI2_SCK_PIN							GPIO_Pin_13
+#define SPI2_MOSI_PIN							GPIO_Pin_15
+#define SPI2_NSS_PIN							GPIO_Pin_12
 
-#define I2C2_GPIO_PORT						GPIOB
-#define I2C2_GPIO_SCL_PIN					GPIO_Pin_10
-#define I2C2_GPIO_SDA_PIN					GPIO_Pin_11
+#define I2C2_GPIO_PORT							GPIOB
+#define I2C2_GPIO_SCL_PIN						GPIO_Pin_10
+#define I2C2_GPIO_SDA_PIN						GPIO_Pin_11
 
-#define TRANSMITTER							0
-#define RECEIVER							1
+#define TRANSMITTER								0
+#define RECEIVER								1
 
-#define MPU6050_ADDRESS                 	0x68
+#define MPU6050_ADDRESS                 		0x68
 
-#define SMPRT_DIV_REGEGISTER            	0x19
-#define CONFIG_REGISTER                 	0x1A
-#define GYRO_CONFIG_REGISTER            	0x1B
-#define ACCEL_CONFIG_REGISTER           	0x1C
-#define INT_ENABLE_REGISTER             	0x38
-#define PWR_MGMT_1_REGISTER             	0x6B
-#define ACCEL_XOUT_REGISTER             	0x3B
-#define ACCEL_YOUT_REGISTER             	0x3D
-#define ACCEL_ZOUT_REGISTER             	0x3F
-#define GYRO_XOUT_REGISTER              	0x43
-#define GYRO_YOUT_REGISTER              	0x45
-#define GYRO_ZOUT_REGISTER              	0x47
-#define INT_ENABLE_REGISTER            	 	0x38
-#define INT_STATUS_REGISTER             	0x3A
+#define SMPRT_DIV_REGEGISTER            		0x19
+#define CONFIG_REGISTER                 		0x1A
+#define GYRO_CONFIG_REGISTER            		0x1B
+#define ACCEL_CONFIG_REGISTER           		0x1C
+#define INT_ENABLE_REGISTER             		0x38
+#define PWR_MGMT_1_REGISTER             		0x6B
+#define ACCEL_XOUT_REGISTER             		0x3B
+#define ACCEL_YOUT_REGISTER             		0x3D
+#define ACCEL_ZOUT_REGISTER             		0x3F
+#define GYRO_XOUT_REGISTER              		0x43
+#define GYRO_YOUT_REGISTER              		0x45
+#define GYRO_ZOUT_REGISTER              		0x47
+#define INT_ENABLE_REGISTER            	 		0x38
+#define INT_STATUS_REGISTER             		0x3A
 
 uint32_t msTick = 0;
 
