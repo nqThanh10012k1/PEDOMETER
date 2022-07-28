@@ -1,0 +1,86 @@
+/*
+ * nhap.c
+ *
+ *  Created on: Jul 24, 2022
+ *      Author: MY COMPUTER
+ */
+
+#include <stm32f10x_rcc.h>
+#include <stm32f10x_gpio.h>
+#include <stm32f10x_i2c.h>
+#include <stm32f10x_usart.h>
+#include <stm32f10x_spi.h>
+#include <stdint.h>
+
+#define SPI2_GPIO_PORT						GPIOB
+#define SPI2_SCK_PIN						GPIO_Pin_13
+#define SPI2_MOSI_PIN						GPIO_Pin_15
+#define SPI2_NSS_PIN						GPIO_Pin_12
+
+void SPI2_MasterInit()
+{
+	GPIO_InitTypeDef GPIO_Init_Structure;
+	SPI_InitTypeDef SPI_Init_Structure;
+
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
+	GPIO_Init_Structure.GPIO_Mode = GPIO_Mode_AF_PP;
+	GPIO_Init_Structure.GPIO_Pin = SPI2_SCK_PIN | SPI2_MOSI_PIN;
+	GPIO_Init_Structure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(SPI2_GPIO_PORT, &GPIO_Init_Structure);
+
+	GPIO_Init_Structure.GPIO_Mode = GPIO_Mode_Out_PP;
+	GPIO_Init_Structure.GPIO_Pin = SPI2_NSS_PIN;
+	GPIO_Init_Structure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(GPIOB, &GPIO_Init_Structure);
+
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);
+	SPI_Init_Structure.SPI_Mode = SPI_Mode_Master;
+	SPI_Init_Structure.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
+	SPI_Init_Structure.SPI_CPOL = SPI_CPOL_Low;
+	SPI_Init_Structure.SPI_CPHA = SPI_CPHA_1Edge;
+	SPI_Init_Structure.SPI_DataSize = SPI_DataSize_16b;
+	SPI_Init_Structure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_32;
+	SPI_Init_Structure.SPI_FirstBit = SPI_FirstBit_MSB;
+	SPI_Init_Structure.SPI_NSS = SPI_NSS_Soft;
+	SPI_Init(SPI2, &SPI_Init_Structure);
+	SPI_Cmd(SPI2, ENABLE);
+}
+
+void SPIx_Send_Data(SPI_TypeDef * SPIx, uint16_t data)
+{
+	GPIO_ResetBits(SPI2_GPIO_PORT, SPI2_NSS_PIN);
+	SPI_I2S_SendData(SPIx, data);
+	while (SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_BSY) == 1);
+	GPIO_SetBits(SPI2_GPIO_PORT, SPI2_NSS_PIN);
+}
+
+void MAX7219_Init()
+{
+	// Decode mode
+	SPIx_Send_Data(SPI2, (0x09 << 8) | 0xFF);
+	// Intensity
+	SPIx_Send_Data(SPI2, (0x0A << 8) | 0x09);
+	// Scan limit
+	SPIx_Send_Data(SPI2, (0x0B << 8) | 0x07);
+	// Shutdown mode
+	SPIx_Send_Data(SPI2, (0x0C << 8) | 0x01);
+	// Display test
+	SPIx_Send_Data(SPI2, (0x0F << 8) | 0x00);
+}
+
+int main()
+{
+	SystemCoreClockUpdate();
+	SPI2_MasterInit();
+	MAX7219_Init();
+
+	for (int i = 1; i < 9; i++)
+	{
+		SPIx_Send_Data(SPI2, (i << 8) | i);
+	}
+
+	while (1)
+	{
+
+	}
+}

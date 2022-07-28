@@ -1,0 +1,10 @@
+13:43:47 **** Incremental Build of configuration Debug for project PEDOMETER ****
+make -j4 all 
+arm-none-eabi-size   PEDOMETER.elf 
+   text	   data	    bss	    dec	    hex	filename
+  12412	    148	   1588	  14148	   3744	PEDOMETER.elf
+Finished building: default.size.stdout
+ 
+
+13:43:48 Build Finished. 0 errors, 0 warnings. (took 597ms)
+

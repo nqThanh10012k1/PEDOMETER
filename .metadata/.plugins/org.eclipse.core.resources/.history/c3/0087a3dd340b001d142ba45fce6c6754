@@ -1,0 +1,101 @@
+/*
+ * nhap.c
+ *
+ *  Created on: Jul 24, 2022
+ *      Author: MY COMPUTER
+ */
+
+#include <stm32f10x_rcc.h>
+#include <stm32f10x_gpio.h>
+#include <stm32f10x_i2c.h>
+#include <stdint.h>
+
+#define I2C2_GPIO_PORT						GPIOB
+#define I2C2_GPIO_SCL_PIN					GPIO_Pin_10
+#define I2C2_GPIO_SDA_PIN					GPIO_Pin_11
+
+#define TRANSMITTER							0
+#define RECEIVER							1
+
+#define DS3231_ADDRESS						0x68
+#define HOURS_ADDRESS						0x02
+
+void I2C2_Init()
+{
+	GPIO_InitTypeDef	GPIO_InitStructure;
+	I2C_InitTypeDef		I2C_InitStructure;
+
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_OD;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_InitStructure.GPIO_Pin = I2C2_GPIO_SCL_PIN | I2C2_GPIO_SDA_PIN;
+	GPIO_Init(GPIOB, &GPIO_InitStructure);
+
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C2, ENABLE);
+	I2C_InitStructure.I2C_Mode = I2C_Mode_I2C;
+	I2C_InitStructure.I2C_ClockSpeed = 400000;
+	I2C_InitStructure.I2C_DutyCycle = I2C_DutyCycle_2;
+	I2C_InitStructure.I2C_Ack = ENABLE;
+	I2C_InitStructure.I2C_AcknowledgedAddress = I2C_AcknowledgedAddress_7bit;
+	I2C_InitStructure.I2C_OwnAddress1 = 0x00;
+	I2C_Init(I2C2, &I2C_InitStructure);
+	I2C_Cmd(I2C2, ENABLE);
+}
+
+uint8_t I2Cx_ReceiveData(I2C_TypeDef * I2Cx, uint8_t SlaveAddress, uint8_t RegisterAddress)
+{
+	uint8_t data = 0;
+
+	// I2C start
+	while (I2C_GetFlagStatus(I2Cx, I2C_FLAG_BUSY));
+	I2C_GenerateSTART(I2Cx, ENABLE);
+	while (!I2C_CheckEvent(I2Cx, I2C_EVENT_MASTER_MODE_SELECT));
+	// I2C address phase
+	I2C_Send7bitAddress(I2Cx, SlaveAddress, I2C_Direction_Transmitter);
+	while (!I2C_CheckEvent(I2Cx, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED));
+	// I2C send register address
+	I2C_SendData(I2Cx, RegisterAddress);
+	while (!I2C_CheckEvent(I2Cx, I2C_EVENT_MASTER_BYTE_TRANSMITTED));
+	// I2C stop
+	I2C_GenerateSTOP(I2Cx, ENABLE);
+
+	// I2C start
+	while (I2C_GetFlagStatus(I2Cx, I2C_FLAG_BUSY));
+	I2C_GenerateSTART(I2Cx, ENABLE);
+	while (!I2C_CheckEvent(I2Cx, I2C_EVENT_MASTER_MODE_SELECT));
+	// I2C address phase
+	/*I2C_Send7bitAddress(I2Cx, SlaveAddress, I2C_Direction_Receiver);
+	while (!I2C_CheckEvent(I2Cx, I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED));
+	// I2C send receive data
+	while (!I2C_CheckEvent(I2Cx, I2C_EVENT_MASTER_BYTE_RECEIVED));
+	data = I2C_ReceiveData(I2Cx);
+	// I2C stop
+	I2C_GenerateSTOP(I2Cx, ENABLE);*/
+
+	return data;
+}
+
+void LED()
+{
+	GPIO_InitTypeDef GPIO_InitStructure;
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_13;
+	GPIO_Init(GPIOC, &GPIO_InitStructure);
+}
+
+int main()
+{
+	SystemCoreClockUpdate();
+	I2C2_Init();
+	LED();
+
+	//I2Cx_ReceiveData(I2C2, DS3231_ADDRESS, HOURS_ADDRESS);
+
+	GPIO_SetBits(GPIOC, GPIO_Pin_13);
+
+	while (1);
+}
+
+
